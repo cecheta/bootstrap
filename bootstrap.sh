@@ -6,7 +6,7 @@ is_wsl2() {
 }
 
 # Add the user to the sudoers file
-echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee "/etc/sudoers.d/$USER"
+echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee "/etc/sudoers.d/$USER" > /dev/null
 
 # Install zsh
 sudo apt update
