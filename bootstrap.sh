@@ -34,7 +34,8 @@ sed -i "s/^plugins=.*/plugins=(${PLUGINS[*]})/" ~/.zshrc
 
 # Install tools
 sudo apt install -y \
-    jq
+    jq \
+    wslu
 
 # Install brew
 curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
