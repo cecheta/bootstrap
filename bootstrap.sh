@@ -104,4 +104,15 @@ curl -fsSL https://gh.io/copilot-install | sudo bash
 # Install Azure CLI
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
+# Install nvm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | PROFILE=~/.zshrc bash
+
+# Install pyenv
+curl -fsSL https://pyenv.run | bash
+cat <<'EOF' >> ~/.zshrc
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init - zsh)"
+EOF
+
 echo "Bootstrap completed, restart the terminal to apply changes."
