@@ -32,20 +32,17 @@ PLUGINS=(
 )
 sed -i "s/^plugins=.*/plugins=(${PLUGINS[*]})/" ~/.zshrc
 
+# Install tools
+sudo apt install -y \
+    jq
+
 # Install brew
 curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
-echo >> ~/.zshrc
-echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.zshrc
+cat <<'EOF' >> ~/.zshrc
 
-# Set up GitHub CLI installation
-(type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) \
-	&& sudo mkdir -p -m 755 /etc/apt/keyrings \
-	&& out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg \
-	&& cat $out | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
-	&& sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
-	&& sudo mkdir -p -m 755 /etc/apt/sources.list.d \
-	&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-	&& sudo apt update
+# Homebrew
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+EOF
 
 # Set up Docker installation
 # Add Docker's official GPG key:
@@ -63,20 +60,15 @@ Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
 Components: stable
 Signed-By: /etc/apt/keyrings/docker.asc
 EOF
-
 sudo apt update
 
-# Install tools
+# Install Docker
 sudo apt install -y \
-    jq \
-    gh \
     docker-ce \
     docker-ce-cli \
     containerd.io \
     docker-buildx-plugin \
     docker-compose-plugin
-
-# Docker post-installation steps
 sudo groupadd docker || true
 sudo usermod -aG docker $USER
 
@@ -98,11 +90,30 @@ if is_wsl2; then
     fi
 fi
 
+# Set up GitHub CLI installation
+(type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) \
+    && sudo mkdir -p -m 755 /etc/apt/keyrings \
+    && out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+    && cat $out | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
+    && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+    && sudo mkdir -p -m 755 /etc/apt/sources.list.d \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+    && sudo apt update
+
+# Install GitHub CLI
+sudo apt install -y gh
+gh completion -s zsh | sudo tee /usr/local/share/zsh/site-functions/_gh > /dev/null
+
 # Install GitHub Copilot CLI
 curl -fsSL https://gh.io/copilot-install | sudo bash
 
 # Install Azure CLI
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+cat <<'EOF' >> ~/.zshrc
+
+# Azure CLI
+source /etc/bash_completion.d/azure-cli
+EOF
 
 # Install nvm
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | PROFILE=~/.zshrc bash
@@ -110,6 +121,8 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | PROFI
 # Install pyenv
 curl -fsSL https://pyenv.run | bash
 cat <<'EOF' >> ~/.zshrc
+
+# pyenv
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init - zsh)"
