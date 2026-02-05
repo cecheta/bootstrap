@@ -26,6 +26,7 @@ git clone https://github.com/zsh-users/zsh-autosuggestions.git ${ZSH_CUSTOM:-$HO
 # # Enable oh-my-zsh plugins
 PLUGINS=(
     docker
+    git
     z
     zsh-syntax-highlighting
     zsh-autosuggestions
